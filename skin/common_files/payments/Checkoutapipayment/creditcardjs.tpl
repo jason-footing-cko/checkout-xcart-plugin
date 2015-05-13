@@ -1,3 +1,4 @@
+<h4>Please select a Credit / Debit card</h4>
 <div class="widget-container"></div>
 <div class="content" id="payment">
     <input type="hidden" name="cko-cc-paymenToken" id="cko-cc-paymenToken" value="">
@@ -45,7 +46,7 @@
     {rdelim}
 </script>
 <script type="text/javascript">
-
+        var reload = false;
         window.CKOConfig = {ldelim}
                 debugMode: false,
                 renderMode: 2,
@@ -62,9 +63,29 @@
                 widgetContainerSelector: '.widget-container',
                 cardCharged: function (event) {ldelim}
                             document.getElementById('cko-cc-paymenToken').value = event.data.paymentToken;
-                            jQuery('button.place-order-button').trigger('submit');
+                            $('button.place-order-button').trigger('submit');
 
-    {rdelim},
+                {rdelim},
+                lightboxDeactivated: function (event) {ldelim}
+
+                    if (reload) {ldelim}
+                        window.location.reload();
+                    {rdelim}
+                {rdelim},
+                paymentTokenExpired: function (event) {ldelim}
+                  reload = true;
+                {rdelim},
+                invalidLightboxConfig: function (event) {ldelim}
+                  reload = true;
+                {rdelim}
     {rdelim};
 </script>
-<script src="https://www.checkout.com/cdn/js/checkout.js" async ></script>
+{if $checkoutapiData.mode eq 'live'}
+    {literal}
+        <script src="https://www.checkout.com/cdn/js/checkout.js" async ></script>
+    {/literal}
+{else}
+    {literal}
+        <script src="//sandbox.checkout.com/js/v1/checkout.js" async ></script>
+    {/literal}
+{/if}

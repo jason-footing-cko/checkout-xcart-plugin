@@ -66,6 +66,7 @@ function getData()
         'currency'        =>    $currency,
         'amount'          =>    $amount,
         'publicKey'       =>    $publictKey,
+        'mode'            =>    $payment_cc_data['param01'],
         'name'            =>    $name,
         'paymentToken'    =>    $paymentTokenArray['token'],
         'message'         =>    $paymentTokenArray['message'],
@@ -106,32 +107,38 @@ function generatePaymentToken()
     foreach ($productsLoad as $item) {
 
         $products[] = array(
-            'name'        =>    $item['product'],
-            'sku'         =>    $item['productcode'],
-            'price'       =>    $item['price'],
-            'quantity'    =>    $item['amount']
+            'name'      =>  $item['product'],
+            'sku'       =>  $item['productcode'],
+            'price'     =>  $item['price'],
+            'quantity'  =>  $item['amount']
         );
     }
     $billingAddressConfig = array(
-        'addressLine1'       =>    $userinfo['b_address'],
-        'addressPostcode'    =>    $userinfo['b_address_2'],
-        'addressCountry'     =>    $userinfo['b_country'],
-        'addressCity'        =>    $userinfo['b_city'],
-        'addressPhone'       =>    $userinfo['b_phone']
+        'addressLine1'  =>  $userinfo['b_address'],
+        'addressLine2'  =>  $userinfo['b_address_2'],
+        'postcode'      =>  $userinfo['b_zipcode'],
+        'country'       =>  $userinfo['b_country'],
+        'state'         =>  $userinfo['b_statename'],
+        'city'          =>  $userinfo['b_city'],
+           'phone'      =>  array (
+                  'number' => $userinfo['b_phone']
+            ),
     );
 
     $shippingAddressConfig = array(
-        'addressLine1'      =>    $userinfo['s_address'],
-        'addressLine2'      =>    $userinfo['s_address_2'],
-        'postcode'          =>    $userinfo['s_zipcode'],
-        'country'           =>    $userinfo['s_country'],
-        'city'              =>    $userinfo['s_city'],
-        'phone'             =>    array('number' => $userinfo['s_phone']),
-        'recipientName'     =>    $userinfo['s_firstname'] . (empty($userinfo['s_firstname']) ? "" : " ") . $userinfo['s_lastname']
+        'addressLine1'  =>  $userinfo['s_address'],
+        'addressLine2'  =>  $userinfo['s_address_2'],
+        'postcode'      =>  $userinfo['s_zipcode'],
+        'country'       =>  $userinfo['s_country'],
+        'state'         =>  $userinfo['s_statename'],
+        'city'          =>  $userinfo['s_city'],
+           'phone'      =>  array (
+                  'number' => $userinfo['s_phone']
+            ),
     );
 
 
-    $config['postedParam'] = array_merge($config['postedParam'], array(
+    $config['postedParam'] = array_merge_recursive($config['postedParam'], array(
         'email'              =>   $userinfo['email'],
         'value'              =>   $amountCents,
         'currency'           =>   $payment_cc_data['param09'],
@@ -148,7 +155,7 @@ function generatePaymentToken()
         'message' => '',
         'success' => '',
         'eventId' => '',
-        'token' => 'test2',
+        'token' => '',
     );
 
     if ($paymentTokenCharge->isValid()) {

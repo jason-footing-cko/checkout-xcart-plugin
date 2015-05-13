@@ -28,9 +28,8 @@
                     </label>
                     <div class="wrapper-field">
                         <select name="param01" class="input-txt required"  required>
-                            <option value="Test"{if $module_data.param01 eq "Test"} selected="selected"{/if}>Test</option>
-                            <option value="Preprod"{if $module_data.param01 eq "Preprod"} selected="selected"{/if}>Preprod</option>
-                            <option value="Live"{if $module_data.param01 eq "Live"} selected="selected"{/if}>Live</option>
+                            <option value="sandbox"{if $module_data.param01 eq "sandbox"} selected="selected"{/if}>Sandbox</option>
+                            <option value="live"{if $module_data.param01 eq "live"} selected="selected"{/if}>Live</option>
                         </select>
                     </div>
                 </li>

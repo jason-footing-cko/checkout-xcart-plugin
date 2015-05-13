@@ -31,16 +31,16 @@ if (empty($posted_data)) {
 
             $advinfo = 'Your payment has been successfully completed';
             func_change_order_status($order_id, 'C', $advinfo); // completed status?
+            
         } elseif ($objectCharge->getRefunded()) {
 
             $advinfo = 'Your payment has been refunded';
             func_change_order_status($order_id, 'D', $advinfo); // declined status?
             
-        } elseif(!$objectCharge->getAuthorised()) { 
+        } elseif (!$objectCharge->getAuthorised()) {
 
             $advinfo[] = 'Your order has been cancelled';
-            func_change_order_status($order_id, 'D', $advinfo); // cancelled status?
+            func_change_order_status($order_id, 'D', $advinfo); // cancelled status?  
         }
     }
 }
-

@@ -57,7 +57,6 @@
                 currency: '{$checkoutapiData.currency}',
                 customerEmail: '{$checkoutapiData.email}',
                 customerName: '{$checkoutapiData.name}',
-                paymentMode: 'card',
                 title: '',
                 subtitle: 'Please enter your credit card details',
                 widgetContainerSelector: '.widget-container',

@@ -35,6 +35,7 @@ abstract class model_methods_Abstract
             );
         }
         
+        $billPhoneLength = strlen($userinfo['b_phone']);
         $billingAddressConfig = array(
             'addressLine1'  =>  $userinfo['b_address'],
             'addressLine2'  =>  $userinfo['b_address_2'],
@@ -42,11 +43,16 @@ abstract class model_methods_Abstract
             'country'       =>  $userinfo['b_country'],
             'state'         =>  $userinfo['b_statename'],
             'city'          =>  $userinfo['b_city'],
-               'phone'      =>  array (
-                      'number' => $userinfo['b_phone']
-                ),
         );
         
+        if ($billPhoneLength > 6){
+            $bilPhoneArray = array(
+                'phone'  => array('number' => $userinfo['b_phone'])
+            );
+            $billingAddressConfig = array_merge_recursive($billingAddressConfig, $bilPhoneArray);  
+        }
+        
+        $shipPhoneLength = strlen($userinfo['s_phone']);
         $shippingAddressConfig = array(
             'addressLine1'  =>  $userinfo['s_address'],
             'addressLine2'  =>  $userinfo['s_address_2'],
@@ -54,10 +60,14 @@ abstract class model_methods_Abstract
             'country'       =>  $userinfo['s_country'],
             'state'         =>  $userinfo['s_statename'],
             'city'          =>  $userinfo['s_city'],
-               'phone'      =>  array (
-                      'number' => $userinfo['s_phone']
-                ),
         );
+        
+        if ($shipPhoneLength > 6){
+            $shipPhoneArray = array(
+                'phone'  => array('number' => $userinfo['s_phone'])
+            );
+            $shippingAddressConfig = array_merge_recursive($shippingAddressConfig, $shipPhoneArray);  
+        }
 
         $config['postedParam'] = array_merge_recursive($config['postedParam'], array(
             'email'           => $userinfo['email'],

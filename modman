@@ -1,7 +1,0 @@
-/skin/common_files/payments/Checkoutapipayment/ /skin/common_files/payments/Checkoutapipayment/
-/skin/common_files/css/checkoutapi.css /skin/common_files/css/checkoutapi.css
-/skin/common_files/images/checkout-logo.png /skin/common_files/images/checkout-logo.png
-/payment/checkoutapipayment.php /payment/checkoutapipayment.php
-/payment/includes /payment/includes
-/checkoutapipayment_processing.php /checkoutapipayment_processing.php
-/include/lib/smarty/plugins/function.checkoutapijs.php /include/lib/smarty/plugins/function.checkoutapijs.php

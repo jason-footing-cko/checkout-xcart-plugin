@@ -154,7 +154,9 @@ function generatePaymentToken()
         'currency'           =>   $payment_cc_data['param09'],
         'shippingDetails'    =>   $shippingAddressConfig,
         'products'           =>   $products,
-        'billingDetails'     =>   $billingAddressConfig
+        'card'            => array(
+                'billingDetails' => $billingAddressConfig
+            )
     ));
 
     $Api = CheckoutApi_Api::getApi(array('mode' => $payment_cc_data['param01']));

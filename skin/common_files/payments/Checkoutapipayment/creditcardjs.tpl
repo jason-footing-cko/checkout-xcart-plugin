@@ -2,13 +2,14 @@
 <div class="widget-container"></div>
 <div class="content" id="payment">
     <input type="hidden" name="cko-cc-paymenToken" id="cko-cc-paymenToken" value="">
+    <input type="hidden" name="cko-cc-redirectUrl" id="cko-cc-redirectUrl" value="">
 </div>
 {checkoutapijs}
 <script>
     function checkCheckoutForm()
     {ldelim}
             // Check if profile filled in: registerform should not exist on the page
-            if ($('form[name=registerform]').length > 0) {
+            if ($('form[name=registerform]').length > 0) {ldelim}
                 xAlert(txt_opc_incomplete_profile, '', 'E');
                 return false;
     {rdelim}
@@ -34,8 +35,15 @@
             var checkoutId = jQuery('#cko-cc-paymenToken').parents('.payment-details').attr('id').split('_')[1];
             if (checkoutId && $('#pm' + checkoutId + ':checked').length
                     && $('#cko-cc-paymenToken').val() == '') {ldelim}
-                                if (CheckoutIntegration){ldelim}
-                                                CheckoutIntegration.open();
+                            if (CheckoutIntegration){ldelim}
+                                if(!CheckoutIntegration.isMobile()){ldelim}
+                                    CheckoutIntegration.open();
+                                {rdelim} else {ldelim}
+                                    document.getElementById('cko-cc-redirectUrl').value = CheckoutIntegration.getRedirectionUrl();
+                                    var transactionValue = CheckoutIntegration.getTransactionValue();
+                                    document.getElementById('cko-cc-paymenToken').value = transactionValue.paymentToken;
+                                    $('button.place-order-button').trigger('submit');
+                                {rdelim}
     {rdelim}
 
                 $('.being-placed, .blockOverlay, .blockPage').hide();
@@ -57,6 +65,8 @@
                 currency: '{$checkoutapiData.currency}',
                 customerEmail: '{$checkoutapiData.email}',
                 customerName: '{$checkoutapiData.name}',
+                forceMobileRedirect: true,
+                paymentMode: 'mixed',
                 title: '',
                 subtitle: 'Please enter your credit card details',
                 widgetContainerSelector: '.widget-container',

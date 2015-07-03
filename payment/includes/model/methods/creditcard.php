@@ -3,31 +3,33 @@
 class model_methods_creditcard extends model_methods_Abstract
 {
 
-    public function handleRequest()
-    {
+  public function handleRequest() {
 
-        $config = parent::handleRequest();
-        $this->_placeorder($config);
-    }
+    $config = parent::handleRequest();
+    $this->_placeorder($config);
+  }
 
-    public function handleResponse($respondCharge)
-    {
-        parent::handleResponse($respondCharge);
-    }
+  public function handleResponse($respondCharge) {
+    parent::handleResponse($respondCharge);
+  }
+
+  public function _createCharge($config) {
+    global $module_params,$secure_oid;
     
-    public function _createCharge($config)
-    {
-        global $module_params;
-        
-        $config = array();
+    $config = array();
 
-        $config['authorization'] = $module_params['param02'];
-        $config['timeout'] = $module_params['param08'];
-        $config['paymentToken'] = $_POST['cko-cc-paymenToken'];
-        $Api = CheckoutApi_Api::getApi(array('mode' => $module_params['param01']));
+    if ($_POST['cko-cc-redirectUrl'] != '') {
+          $skey = $secure_oid[0];
 
-        return $Api->verifyChargePaymentToken($config);
-
+      $urlRedirect = $_POST['cko-cc-redirectUrl'] . '&trackId=' . $skey;
+      func_header_location($urlRedirect);
     }
+
+    $config['authorization'] = $module_params['param02'];
+    $config['timeout'] = $module_params['param08'];
+    $config['paymentToken'] = $_POST['cko-cc-paymenToken'];
+    $Api = CheckoutApi_Api::getApi(array('mode' => $module_params['param01']));
+    return $Api->verifyChargePaymentToken($config);
+  }
 
 }

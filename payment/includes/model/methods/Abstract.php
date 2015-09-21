@@ -13,7 +13,8 @@ abstract class model_methods_Abstract
                 VALUES ('" . addslashes($orderid) . "','" . $XCARTSESSID . "','GO|" . implode('|', $secure_oid) . "')");
 
         $config = array();
-        $amountCents = (int) (100 * $cart['total_cost']);
+        $Api = CheckoutApi_Api::getApi(array('mode' => $module_params['param01']));
+        $amountCents = $Api->valueToDecimal($cart['total_cost'],$module_params['param09']);
         $config['authorization'] = $module_params['param02'];
         $config['mode'] = $module_params['param01'];
         
@@ -39,34 +40,34 @@ abstract class model_methods_Abstract
         $billingAddressConfig = array(
             'addressLine1'  =>  $userinfo['b_address'],
             'addressLine2'  =>  $userinfo['b_address_2'],
-            'postcode'      =>  $userinfo['b_zipcode'],
+            'postcode'      => $userinfo['b_zipcode'],
             'country'       =>  $userinfo['b_country'],
-            'state'         =>  $userinfo['b_statename'],
+            'state'         => $userinfo['b_statename'],
             'city'          =>  $userinfo['b_city'],
         );
         
         if ($billPhoneLength > 6){
-            $bilPhoneArray = array(
-                'phone'  => array('number' => $userinfo['b_phone'])
-            );
-            $billingAddressConfig = array_merge_recursive($billingAddressConfig, $bilPhoneArray);  
-        }
-        
+          $bilPhoneArray = array(
+              'phone'  => array('number' => $userinfo['b_phone'])
+          );
+          $billingAddressConfig = array_merge_recursive($billingAddressConfig, $bilPhoneArray);  
+       }
+       
         $shipPhoneLength = strlen($userinfo['s_phone']);
         $shippingAddressConfig = array(
             'addressLine1'  =>  $userinfo['s_address'],
             'addressLine2'  =>  $userinfo['s_address_2'],
-            'postcode'      =>  $userinfo['s_zipcode'],
+            'postcode'      => $userinfo['s_zipcode'],
             'country'       =>  $userinfo['s_country'],
-            'state'         =>  $userinfo['s_statename'],
+            'state'         => $userinfo['s_statename'],
             'city'          =>  $userinfo['s_city'],
         );
         
         if ($shipPhoneLength > 6){
-            $shipPhoneArray = array(
-                'phone'  => array('number' => $userinfo['s_phone'])
-            );
-            $shippingAddressConfig = array_merge_recursive($shippingAddressConfig, $shipPhoneArray);  
+          $shipPhoneArray = array(
+              'phone'  => array('number' => $userinfo['s_phone'])
+          );
+          $shippingAddressConfig = array_merge_recursive($shippingAddressConfig, $shipPhoneArray);  
         }
 
         $config['postedParam'] = array_merge_recursive($config['postedParam'], array(
@@ -77,10 +78,10 @@ abstract class model_methods_Abstract
             'description'     => "Order number::$orderid",
             'shippingDetails' => $shippingAddressConfig,
             'products'        => $products,
-            'card'            => array(
-                  'billingDetails' => $billingAddressConfig
-            )
-        ));
+            'card'     => array(
+                            'billingDetails' => $billingAddressConfig
+                            )
+            ));
         return $config;
     }
 
@@ -91,16 +92,32 @@ abstract class model_methods_Abstract
         $skey = $secure_oid[0];
 
         $xcart_catalogs['customer'];
-
+        $Api = CheckoutApi_Api::getApi(array('mode' => $module_params['param01']));
+        $amountCents = $Api->valueToDecimal($cart['total_cost'],$module_params['param09']);
+ 
+         $toValidate = array(
+          'currency' => $module_params['param09'],
+          'value' => $amountCents,
+          'trackId' => $skey,
+        );
+        
         if ($respondCharge->isValid()) {
+          
             if (preg_match('/^1[0-9]+$/', $respondCharge->getResponseCode())) {
 
                 // update charge trackId
-                $Api = CheckoutApi_Api::getApi(array('mode' => $module_params['param01']));
-                $chargeUpdated = $Api->updateTrackId($respondCharge,$skey);
-
+                $chargeUpdated = $Api->updateTrackId($respondCharge, $skey);
+                $charge['chargeId'] = $respondCharge->getId(); 
+                $respondCharge = $Api->getCharge($charge);
+                $validateRequest = $Api::validateRequest($toValidate,$respondCharge);
+                $message = 'Transaction approved. Charge ID : ' . $respondCharge->getId();
+                if($validateRequest['status']){  
+                      foreach($validateRequest['message'] as $errormessage){
+                        $message .= $errormessage . '. ';
+                      }
+                }
                 $bill_output['code'] = 1;
-                $bill_output['billmes'] = 'Transaction approved. Charge ID : ' . $respondCharge->getId();
+                $bill_output['billmes'] = $message;
                 
             } else { 
                 $bill_output['code'] = 2;

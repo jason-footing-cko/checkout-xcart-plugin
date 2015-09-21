@@ -16,17 +16,30 @@ if ($_POST['cko-payment-token'] && $_POST['cko-track-id']) {
 
   $config['authorization'] = $payment_cc_data['param02'];
   $config['paymentToken'] = $paymentToken;
-
   $Api = CheckoutApi_Api::getApi(array('mode' => $payment_cc_data['param01']));
+  $amountCents = $Api->valueToDecimal($cart['total_cost'],$payment_cc_data['param09']);
+  $toValidate = array(
+    'currency' => $payment_cc_data['param09'],
+    'value' => $amountCents,
+    'trackId' => $skey,
+  );
   $objectCharge = $Api->verifyChargePaymentToken($config);
   
   $chargeUpdated = $Api->updateTrackId($objectCharge, $skey);
-
+  $charge['chargeId'] = $objectCharge->getId(); 
+  $objectCharge = $Api->getCharge($charge);
+  $validateRequest = $Api::validateRequest($toValidate,$objectCharge);
+  $message = 'Transaction approved. Charge ID : ' . $objectCharge->getId();
+  if($validateRequest['status']){  
+    foreach($validateRequest['message'] as $errormessage){
+      $message .= $errormessage . '. ';
+    }
+  }
 
   if (preg_match('/^1[0-9]+$/', $objectCharge->getResponseCode())) {
 
     $bill_output['code'] = 1;
-    $bill_output['billmes'] = 'Transaction approved. Charge ID : ' . $objectCharge->getId();
+    $bill_output['billmes'] = $message;
   }
   else {
 

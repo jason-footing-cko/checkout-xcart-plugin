@@ -18,8 +18,6 @@ class Model
     {
         global $module_params;
         $methodType =  $module_params['param05'];
-
-
         if(!$this->_instance) {
             switch($methodType) {
                 case 'yes':

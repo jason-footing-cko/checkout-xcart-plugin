@@ -81,7 +81,6 @@ function generatePaymentToken()
 {
     global $userinfo, $cart;
 
-
     $instance = getInstance();
     $payment_cc_data = cko_config();
 
@@ -89,7 +88,9 @@ function generatePaymentToken()
 
     $productsLoad = $cart['products'];
     $scretKey = $payment_cc_data['param02'];
-    $amountCents = (int) (100 * $cart['total_cost']);
+    $Api = CheckoutApi_Api::getApi(array('mode' => $payment_cc_data['param01']));
+    $amountCents = $Api->valueToDecimal($cart['total_cost'],$payment_cc_data['param09']);
+    
     $config['authorization'] = $scretKey;
     $config['mode'] = $payment_cc_data['param01'];
     $config['timeout'] = $payment_cc_data['param08'];
@@ -159,7 +160,7 @@ function generatePaymentToken()
             )
     ));
 
-    $Api = CheckoutApi_Api::getApi(array('mode' => $payment_cc_data['param01']));
+    
 
     $paymentTokenCharge = $Api->getPaymentToken($config);
 
@@ -190,4 +191,3 @@ function smarty_function_checkoutapijs($params, &$smarty)
     $smarty->assign('checkoutapiData', $data);
     
 }
-
